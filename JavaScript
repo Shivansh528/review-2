@@ -1,0 +1,83 @@
+document.addEventListener("DOMContentLoaded", () => {
+    // Validate form on submission
+    const form = document.querySelector("form");
+    const fields = form.querySelectorAll("input[required]");
+    const passwordInput = document.getElementById("password");
+    const emailInput = document.getElementById("email");
+
+    form.addEventListener("submit", (event) => {
+        let isValid = true;
+
+        // Check required fields
+        fields.forEach((field) => {
+            const errorSpan = field.nextElementSibling;
+            if (!field.value.trim()) {
+                isValid = false;
+                errorSpan.textContent = `${field.placeholder} is required.`;
+            } else {
+                errorSpan.textContent = "";
+            }
+        });
+
+        // Validate email format
+        if (emailInput && !validateEmail(emailInput.value)) {
+            isValid = false;
+            const errorSpan = emailInput.nextElementSibling;
+            errorSpan.textContent = "Please enter a valid email address.";
+        }
+
+        // Prevent form submission if invalid
+        if (!isValid) {
+            event.preventDefault();
+        }
+    });
+
+    // Password strength checker
+    if (passwordInput) {
+        const strengthIndicator = document.getElementById("password-strength");
+        passwordInput.addEventListener("input", () => {
+            const strength = getPasswordStrength(passwordInput.value);
+            strengthIndicator.textContent = `Strength: ${strength}`;
+            strengthIndicator.style.color = getStrengthColor(strength);
+        });
+    }
+
+    // Live input feedback
+    fields.forEach((field) => {
+        field.addEventListener("input", () => {
+            const errorSpan = field.nextElementSibling;
+            if (field.value.trim()) {
+                errorSpan.textContent = "";
+            }
+        });
+    });
+
+    // Utility Functions
+    function validateEmail(email) {
+        const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return regex.test(email);
+    }
+
+    function getPasswordStrength(password) {
+        if (password.length >= 8 && /[A-Z]/.test(password) && /[0-9]/.test(password)) {
+            return "Strong";
+        } else if (password.length >= 6) {
+            return "Medium";
+        } else {
+            return "Weak";
+        }
+    }
+
+    function getStrengthColor(strength) {
+        switch (strength) {
+            case "Strong":
+                return "green";
+            case "Medium":
+                return "orange";
+            case "Weak":
+                return "red";
+            default:
+                return "black";
+        }
+    }
+});
